@@ -1,0 +1,93 @@
+/* Global Gothic Theme Styles */
+:root {
+  --background-color: #0a0a0a;
+  --text-color: #d8d8d8;
+  --accent-color: #7d0000;
+  --secondary-color: #2d2d2d;
+  --border-color: #333;
+  --font-main: 'Georgia', serif;
+  --font-accent: 'Copperplate', 'Papyrus', fantasy;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family: var(--font-main);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background-image: url('/images/background-texture.png');
+  background-repeat: repeat;
+  background-size: 400px;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #a00;
+}
+
+button {
+  font-family: var(--font-main);
+  cursor: pointer;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input, textarea, select {
+  font-family: var(--font-main);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Custom scrollbar for gothic theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #900;
+}
