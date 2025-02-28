@@ -5,10 +5,31 @@ backend/node_modules/
 
 # Ignore Next.js build files
 .next/
+out/
 
 # Ignore environment variables (API keys, secrets)
 .env
+.env.local
+.env.development
+.env.production
 
 # Ignore system files
 .DS_Store
 *.log
+*.lock
+
+# Ignore package manager lock files (if not needed)
+pnpm-lock.yaml
+yarn.lock
+
+# Ignore large Next.js binary dependencies that caused push errors
+frontend/node_modules/@next/swc-win32-x64-msvc/
+backend/node_modules/@next/swc-win32-x64-msvc/
+
+# Ignore VSCode workspace settings (optional)
+.vscode/
+
+# Ignore temporary files & crash reports
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
