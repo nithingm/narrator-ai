@@ -2,7 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const bodyParser = require('body-parser');
-require('dotenv').config(); // If using environment variables for API keys
+require('dotenv').config();
+console.log("🔍OPENAI API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
+console.log("🔍CLAUDE API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
+console.log("🔍DEEPSEEK API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
 
 const app = express();
 const PORT = 5000;
@@ -50,9 +53,10 @@ app.post('/api/chat', async (req, res) => {
   
 });
 
-// ✅ Function to call OpenAI API
 async function callOpenAI(systemPrompt, userMessage) {
     try {
+        console.log("🔍 Using OpenAI API Key:", OPENAI_API_KEY.substring(0, 10) + "...");
+
         const response = await axios.post(
             "https://api.openai.com/v1/chat/completions",
             {
@@ -71,12 +75,19 @@ async function callOpenAI(systemPrompt, userMessage) {
             }
         );
 
+        // ✅ Safely check if choices exist
+        if (!response.data || !response.data.choices || response.data.choices.length === 0) {
+            throw new Error("OpenAI response is missing choices.");
+        }
+
         return response.data.choices[0].message.content;
     } catch (error) {
-        console.error("OpenAI API Error:", error.response?.data || error.message);
-        throw new Error("Failed to communicate with OpenAI API.");
+        console.error("🚨 OpenAI API Error:", error.response?.data || error.message);
+
+        return "I'm having trouble reaching OpenAI at the moment. Please try again later.";
     }
 }
+
 
 // ✅ Function to call DeepSeek API (Similar to OpenAI)
 async function callDeepSeek(systemPrompt, userMessage) {
@@ -136,37 +147,42 @@ async function callClaude(systemPrompt, userMessage) {
       );
 
       // ✅ Ensure response has valid content before accessing
-      if (response.data?.content && response.data.content.length > 0) {
-          return response.data.content[0].text || "Claude responded, but no text was found.";
-      } else {
-          return "Claude did not return a valid response. Try again.";
-      }
+      if (!response.data || !response.data.content) {
+        throw new Error("Invalid response from Claude API.");
+        }
 
-  } catch (error) {
-      console.error("Claude API Error:", error.response?.data || error.message);
+      return response.data.content[0].text || "Claude responded, but no text was found.";
+    } catch (error) {
+        console.error("🚨 Claude API Error:", error.response?.data || error.message);
 
-      let errorMessage = "An unexpected error occurred while communicating with Claude.";
+        let errorMessage = "An unexpected error occurred while communicating with Claude.";
 
-      if (error.response) {
-          if (error.response.status === 400) {
-              errorMessage = `Claude API error: 400 - ${JSON.stringify(error.response.data)}`;
-          } else if (error.response.status === 401) {
-              errorMessage = "Claude API key is invalid. Please check your API key.";
-          } else if (error.response.status === 403) {
-              errorMessage = "Access to Claude is restricted. Verify your API key permissions.";
-          } else if (error.response.status === 402) {
-              errorMessage = "Claude requires a paid API key. Try another model.";
-          } else if (error.response.status === 500) {
-              errorMessage = "Claude's server is experiencing issues. Please try again later.";
-          } else {
-              errorMessage = `Claude API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`;
-          }
-      } else if (error.request) {
-          errorMessage = "No response from Claude. Please check your internet connection.";
-      }
+        if (error.response) {
+            switch (error.response.status) {
+                case 400:
+                    errorMessage = `Claude API error: 400 - ${JSON.stringify(error.response.data)}`;
+                    break;
+                case 401:
+                    errorMessage = "Claude API key is invalid. Please check your API key.";
+                    break;
+                case 403:
+                    errorMessage = "Access to Claude is restricted. Verify your API key permissions.";
+                    break;
+                case 402:
+                    errorMessage = "Claude requires a paid API key. Try another model.";
+                    break;
+                case 500:
+                    errorMessage = "Claude's server is experiencing issues. Please try again later.";
+                    break;
+                default:
+                    errorMessage = `Claude API error: ${error.response.status} - ${JSON.stringify(error.response.data)}`;
+            }
+        } else if (error.request) {
+            errorMessage = "No response from Claude. Please check your internet connection.";
+        }
 
-      return errorMessage;
-  }
+        return errorMessage;  // 🔥 Return instead of throwing to prevent UI crash
+    }
 }
 
 
