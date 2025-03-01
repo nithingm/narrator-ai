@@ -7,8 +7,23 @@ const ChatInterface = ({ character, onBack, user }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [modelProvider, setModelProvider] = useState(character.defaultModel || 'ollama');
+  const [ollamaModels, setOllamaModels] = useState([]); //Store available ollama models
   const messagesEndRef = useRef(null);
   
+  // Fetch available Ollama models on component mount
+  useEffect(() => {
+    const fetchOllamaModels = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/ollama-models');
+        setOllamaModels(response.data.models || []);
+      } catch (error) {
+        console.error("Error fetching Ollama models:", error);
+      }
+    };
+
+    fetchOllamaModels();
+  }, []);
+
   // Add initial welcome message on component mount
   useEffect(() => {
     if (!character || !character.id) return;
@@ -46,55 +61,64 @@ const ChatInterface = ({ character, onBack, user }) => {
   
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return; // Prevent duplicate sends
-  
+
     const currentMessage = input; // Preserve message before clearing input
     setMessages(prev => [...prev, { role: 'user', content: currentMessage, timestamp: new Date().toISOString() }]);
     setInput('');
     setIsLoading(true);
-  
+
+    let selectedModel = modelProvider;
+    
+    // 🔥 Fix: Ensure local models are prefixed with "ollama:"
+    if (!["openai", "deepseek", "claude"].includes(selectedModel)) {
+        selectedModel = `ollama:${selectedModel}`;
+    }
+    
+    console.log("🟢 Sending message with model:", selectedModel);  // ✅ Debug log
+
     try {
-      const response = await axios.post('http://localhost:5000/api/chat', {
-        message: currentMessage,
-        characterId: character.id,
-        modelProvider,
-        systemPrompt: character.systemPrompt
-      });
-  
-      // ✅ Ensure response and response.data exist before accessing them
-      if (!response || !response.data || !response.data.message) {
-        throw new Error("Invalid response from AI API.");
-      }
-  
-      const aiMessage = {
-        role: 'assistant',
-        content: response.data?.message || "Hmm... It seems something went wrong. Try again?",
-        timestamp: new Date().toISOString(),
-        isError: !response.data?.message
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error("Error sending message:", error);
-  
-      // ✅ Handle DeepSeek API-specific errors
-      let errorMessage = "I apologize, but something went wrong.";
-      if (error.response) {
-        if (error.response.status === 500) {
-          errorMessage = "DeepSeek API is unavailable or requires payment. Try a different model.";
-        } else if (error.response.status === 403) {
-          errorMessage = "Access denied to DeepSeek. Check API settings.";
-        } else {
-          errorMessage = `Server Error: ${error.response.status} - ${error.response.data?.error || "Unknown error"}`;
+        const response = await axios.post('http://localhost:5000/api/chat', {
+            message: currentMessage,
+            characterId: character.id,
+            modelProvider: selectedModel,  // ✅ Use corrected model name
+            systemPrompt: character.systemPrompt
+        });
+
+        // ✅ Ensure response and response.data exist before accessing them
+        if (!response || !response.data || !response.data.message) {
+            throw new Error("Invalid response from AI API.");
         }
-      } else if (error.request) {
-        errorMessage = "No response from the AI model. Please check your connection.";
-      }
-  
-      setMessages(prev => [...prev, { role: 'assistant', content: errorMessage, timestamp: new Date().toISOString(), isError: true }]);
+
+        const aiMessage = {
+            role: 'assistant',
+            content: response.data?.message || "Hmm... It seems something went wrong. Try again?",
+            timestamp: new Date().toISOString(),
+            isError: !response.data?.message
+        };
+        setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+        console.error("Error sending message:", error);
+
+        // ✅ Handle DeepSeek API-specific errors
+        let errorMessage = "I apologize, but something went wrong.";
+        if (error.response) {
+            if (error.response.status === 500) {
+                errorMessage = "DeepSeek API is unavailable or requires payment. Try a different model.";
+            } else if (error.response.status === 403) {
+                errorMessage = "Access denied to DeepSeek. Check API settings.";
+            } else {
+                errorMessage = `Server Error: ${error.response.status} - ${error.response.data?.error || "Unknown error"}`;
+            }
+        } else if (error.request) {
+            errorMessage = "No response from the AI model. Please check your connection.";
+        }
+
+        setMessages(prev => [...prev, { role: 'assistant', content: errorMessage, timestamp: new Date().toISOString(), isError: true }]);
     } finally {
-      setIsLoading(false); // ✅ Ensure UI doesn't get stuck in loading state
+        setIsLoading(false); // ✅ Ensure UI doesn't get stuck in loading state
     }
   };
-  
+
 
   
   
@@ -105,7 +129,7 @@ const ChatInterface = ({ character, onBack, user }) => {
       handleSendMessage();
     }
   };
-  
+  // Generate AL Model Dropdown Options
   const getAIModelOptions = () => {
     return (
       <select 
@@ -113,10 +137,16 @@ const ChatInterface = ({ character, onBack, user }) => {
         onChange={(e) => setModelProvider(e.target.value)}
         className={styles.modelSelector}
       >
-        <option value="ollama">Local (Ollama)</option>
         <option value="openai">OpenAI</option>
         <option value="claude">Claude</option>
         <option value="deepseek">DeepSeek</option>
+
+        {/* Dynamically List Ollama Models */}
+        {ollamaModels.map((model) => (
+          <option key={model} value={model}>
+            Local: {model}
+          </option>
+        ))}
       </select>
     );
   };

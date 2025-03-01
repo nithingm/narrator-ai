@@ -3,9 +3,6 @@ const cors = require('cors');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 require('dotenv').config({path: '../.env'});
-console.log("🔍OPENAI API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
-console.log("🔍CLAUDE API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
-console.log("🔍DEEPSEEK API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
 
 const app = express();
 const PORT = 5000;
@@ -19,16 +16,44 @@ const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
 const OLLAMA_API_URL = "http://localhost:11434/api/generate"; // Ollama (Local LLM)
 
+// Route to get available Ollama models dynamically
+app.get('/api/ollama-models', async (req, res) => {
+    try {
+        const response = await axios.get("http://localhost:11434/api/tags");
+        
+        if (!response.data || !response.data.models) {
+            return res.json({ models: [] });
+        }
+
+        const models = response.data.models.map(m => m.name); // Extract model names
+        console.log("✅ Available Ollama models:", models);
+        
+        return res.json({ models });
+    } catch (error) {
+        console.error("🚨 Failed to fetch Ollama models:", error.message);
+        return res.status(500).json({ models: [], error: "Unable to retrieve Ollama models" });
+    }
+});
+
 // Route to handle chat requests
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message, characterId, modelProvider, systemPrompt } = req.body;
+        console.log("🟢 Received chat request:", req.body);  // ✅ Debug log
 
+        // ✅ Change `const` to `let` so it can be reassigned
+        let { message, characterId, modelProvider, systemPrompt } = req.body;
+        
         if (!message || !modelProvider) {
+            console.error("❌ Missing required parameters:", req.body);
             return res.status(400).json({ error: "Missing required parameters: message or modelProvider" });
         }
 
-        console.log(`Incoming request → Model: ${modelProvider}, Character: ${characterId}`);
+        console.log(`💬 Incoming request → Model: ${modelProvider}, Character: ${characterId}`);
+        
+        // 🔥 Fix: Auto-prefix "ollama:" if it's a local model
+        if (!["openai", "deepseek", "claude"].includes(modelProvider)) {
+            modelProvider = `ollama:${modelProvider}`;
+        }
 
         let aiResponse;
 
@@ -36,11 +61,12 @@ app.post('/api/chat', async (req, res) => {
             aiResponse = await callOpenAI(systemPrompt, message);
         } else if (modelProvider === "deepseek") {
             aiResponse = await callDeepSeek(systemPrompt, message);
-        } else if (modelProvider === "ollama") {
-            aiResponse = await callOllama(systemPrompt, message);
+        } else if (modelProvider.startsWith("ollama")) { //Detects Ollama models dynamically
+            aiResponse = await callOllama(modelProvider.replace("ollama:", ""), systemPrompt, message);
         } else if (modelProvider === "claude") {
             aiResponse = await callClaude(systemPrompt, message);
         } else {
+            console.error("❌ Invalid modelProvider:", modelProvider);
             return res.status(400).json({ error: "Invalid modelProvider" });
         }
 
@@ -187,21 +213,34 @@ async function callClaude(systemPrompt, userMessage) {
 
 
 // ✅ Function to call Ollama (local LLM)
-async function callOllama(systemPrompt, userMessage) {
+async function callOllama(modelName, systemPrompt, userMessage) {
     try {
+        if (modelName.startsWith("ollama:")) {
+            modelName = modelName.replace("ollama:", "");
+        }
+        console.log(`🔍 Calling Ollama model: ${modelName}`);
+
         const response = await axios.post(
-            OLLAMA_API_URL,
+            "http://localhost:11434/api/generate",
             {
-                model: "llama3.2:1b", // Modify this if you want to use a different local model
+                model: modelName, // Use the selected Ollama model
                 prompt: `${systemPrompt}\nUser: ${userMessage}\nAssistant:`,
                 stream: false
             }
         );
+        
+        console.log("🟢 Ollama response:", response.data);
+        // ✅ Validate the response format before returning
+        if (!response.data || !response.data.response) {
+            throw new Error("Invalid response from Ollama API.");
+        }
 
         return response.data.response;
     } catch (error) {
-        console.error("Ollama API Error:", error.response?.data || error.message);
-        throw new Error("Failed to communicate with Ollama API.");
+        console.error("🚨 Ollama API Error:", error.response?.data || error.message);
+
+        // ✅ Ensure a safe error message is returned instead of crashing UI
+        return "Error: Failed to generate a response from Ollama. Please check the model or try again.";
     }
 }
 
