@@ -8,7 +8,7 @@ const BookSelection = ({ characters, onSelect }) => {
       <p className={styles.bookSelectionSubtitle}>
         Select a character from the literary classics to begin your conversation
       </p>
-      
+
       <div className={styles.bookGrid}>
         {characters.map((character) => (
           <div
@@ -16,32 +16,31 @@ const BookSelection = ({ characters, onSelect }) => {
             className={styles.bookCard}
             style={{
               backgroundColor: character.backgroundColor || '#1a1a1a',
-              borderColor: character.accent || '#444'
+              '--shadow-color': character.shadowColor,
+              '--hover-bg': character.hoverBackground,
             }}
             onClick={() => onSelect(character)}
           >
-            <div className={styles.bookCover}>
-              {/* In production, this would display an image */}
-              <div 
-                className={styles.bookImagePlaceholder}
-                style={{ backgroundColor: character.accent || '#444' }}
-              >
-                {character.name.charAt(0)}
+            {/* Image Section */}
+            <div className={styles.bookCardTop}>
+              <img
+                src={`/images/characters/${character.id}.webp`}
+                alt={character.name}
+                className={styles.characterImage}
+              />
+
+              {/* Overlay Description */}
+              <div className={styles.bookOverlay}>
+                <p className={styles.overlayText}>{character.description}</p>
               </div>
             </div>
+
+            {/* Character Details */}
             <div className={styles.bookInfo}>
-              <h3 
-                className={styles.bookTitle}
-                style={{ color: character.textColor || '#fff' }}
-              >
-                {character.name}
-              </h3>
-              <p className={styles.bookAuthor}>{character.title}</p>
-              <p className={styles.bookDescription}>{character.description}</p>
-              <div className={styles.bookMetadata}>
-                <span>{character.book} ({character.year})</span>
-                <span>by {character.author}</span>
-              </div>
+              <h3 className={styles.bookTitle}>{character.name}</h3>
+              <p className={styles.bookSubtitle}>{character.title}</p>
+              <p className={styles.bookMeta}>{character.book} ({character.year})</p>
+              <p className={styles.bookMeta}>by {character.author}</p>
             </div>
           </div>
         ))}

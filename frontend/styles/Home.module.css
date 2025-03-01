@@ -1,4 +1,3 @@
-/* Main layout */
 .container {
   display: flex;
   flex-direction: column;
@@ -17,10 +16,22 @@
 }
 
 .header h1 {
-  font-family: var(--font-accent);
+  font-family: 'Cinzel Decorative', serif;
   color: var(--accent-color);
-  font-size: 2.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  font-size: 1.7rem;
+  text-shadow: 
+    0 0 2px rgba(255, 0, 0, 0.8),  /* Outer Red Glow */
+    0 0 4px rgba(255, 0, 0, 0.6),
+    0 0 6px rgba(255, 0, 0, 0.4),
+    -1px -1px 2px rgba(0, 0, 0, 0.9); /* Heavy Shadow */
+  letter-spacing: 2px;
+  font-weight: 400;
+  animation: flicker 1.8s infinite alternate;
+}
+@keyframes flicker {
+  0% { opacity: 1; text-shadow: 0 0 3px rgba(255, 0, 0, 0.9); }
+  50% { opacity: 0.8; text-shadow: 0 0 4px rgba(255, 0, 0, 0.7); }
+  100% { opacity: 1; text-shadow: 0 0 2px rgba(255, 0, 0, 0.8); }
 }
 
 .main {
@@ -58,12 +69,15 @@
   text-align: center;
 }
 
+/* Main Subtitle (Choose a Gothic Character) */
 .bookSelectionTitle {
-  font-family: var(--font-accent);
-  font-size: 2rem;
-  margin-bottom: 10px;
-  color: var(--accent-color);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  font-family: 'UnifrakturMaguntia', serif;
+  font-size: 3.5rem;
+  /*color: var(--accent-color);*/
+  color: #660000;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+  font-weight: 400;
 }
 
 .bookSelectionSubtitle {
@@ -78,22 +92,69 @@
   gap: 30px;
 }
 
+/* Character Card Background & Hover */
+/* Book Cards */
 .bookCard {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #333;
+  position: relative;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   height: 100%;
-  background-color: #1a1a1a;
+  background-color: var(--background-color);
 }
 
+/* Hover Effect - Shadow */
 .bookCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 20px rgba(var(--shadow-color), 0.6);
 }
+
+
+/* Top Section - Image and Details */
+.bookCardTop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  position: relative;
+}
+
+/* Character Image */
+.characterImage {
+  width: 100%;
+  height: 250px; /* Maintain Aspect Ratio */
+  object-fit: cover;
+  transition: filter 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Dark Overlay (Initially Hidden) */
+.bookOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Darken on Hover */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Description Text */
+.overlayText {
+  font-size: 1rem;
+  color: #ddd;
+  font-family: var(--font-main);
+  line-height: 1.5;
+  max-width: 90%;
+}
+
 
 .bookCover {
   height: 150px;
@@ -103,15 +164,12 @@
   overflow: hidden;
 }
 
+/* Gothic Style Initials (C, F) */
 .bookImagePlaceholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 4rem;
+  font-family: var(--gothic-font);
   color: white;
-  font-family: var(--font-accent);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
 }
 
 .bookInfo {
@@ -121,10 +179,20 @@
   flex-direction: column;
 }
 
+/* Character Name (Count Dracula, Frankenstein's Monster) */
 .bookTitle {
   font-family: var(--font-accent);
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin-top: 10px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.bookSubtitle {
+  font-size: 1rem;
+  color: #999;
   margin-bottom: 5px;
+  font-style: italic;
 }
 
 .bookAuthor {
@@ -134,10 +202,47 @@
 }
 
 .bookDescription {
+  font-family: var(--classic-font);
+  font-size: 1rem;
+  color: #bbb;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  line-height: 1.6;
+}
+
+.bookMeta {
   font-size: 0.9rem;
   color: #bbb;
-  margin-bottom: 15px;
-  flex: 1;
+}
+
+/* Bottom Section - Hidden Description (Appears on Hover) */
+.bookCardBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;  /* ✅ Hidden by default */
+  background-color: var(--hover-bg);  /* ✅ Dynamic hover background */
+  color: white;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  padding: 15px;
+  text-align: center;
+}
+
+/* Hover Effect - Darkens Image & Shows Overlay */
+.bookCard:hover .characterImage {
+  filter: brightness(30%) contrast(120%);
+}
+
+.bookCard:hover .bookOverlay {
+  opacity: 1;
+}
+
+/* Show the description only when hovering over the lower half */
+.bookCard:hover .bookCardBottom {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .bookMetadata {
