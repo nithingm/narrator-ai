@@ -1,4 +1,5 @@
 # Narrator AI
+![Homepage](./frontend/public/images/Narrator_AI_Homepage.png)
 
 A gothic-themed chatbot where users can select a book, choose a character, and chat with them. The app supports multiple AI models including OpenAI, DeepSeek, Claude, and local models via Ollama.
 
