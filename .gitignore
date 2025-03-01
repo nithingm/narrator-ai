@@ -13,6 +13,9 @@ out/
 .env.development
 .env.production
 
+#Allow the template .env file to be committed
+!backend/.env
+
 # Ignore system files
 .DS_Store
 *.log
