@@ -26,8 +26,6 @@ start start.bat
 
 This will start both the backend server and the frontend development server.
 
-- Backend runs on: http://localhost:5000
-- Frontend runs on: http://localhost:3000
 - On browser, go to http://localhost:3000 to use the app
 
 ## Running Manually
@@ -48,6 +46,9 @@ cd frontend
 npm run dev
 ```
 
+- Backend runs on: http://localhost:5000
+- Frontend runs on: http://localhost:3000
+  
 ## Features
 
 - Gothic-themed user interface with customizable styling
