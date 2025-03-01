@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const bodyParser = require('body-parser');
-require('dotenv').config();
+require('dotenv').config({path: '../.env'});
 console.log("🔍OPENAI API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
 console.log("🔍CLAUDE API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
 console.log("🔍DEEPSEEK API Key Loaded:", process.env.OPENAI_API_KEY ? "✅ Yes" : "❌ No");
