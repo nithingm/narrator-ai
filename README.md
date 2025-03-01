@@ -2,18 +2,33 @@
 
 A gothic-themed chatbot where users can select a book, choose a character, and chat with them. The app supports multiple AI models including OpenAI, DeepSeek, Claude, and local models via Ollama.
 
+## Setup
+1. Install ollama for local model llama3.2:1b
+```bash
+ollama run llama3.2:1b
+```
+2. Replace .env file contents with API keys in the project folder to use OpenAI/Claude/Deepseek.
+   
 ## Quick Start
 
 Run the application using the start script:
+On terminal, go to the project folder
 
+On Linux/Mac:
 ```bash
 ./start.sh
 ```
+On Windows:
+```bash
+start start.bat
+```
+
 
 This will start both the backend server and the frontend development server.
 
 - Backend runs on: http://localhost:5000
 - Frontend runs on: http://localhost:3000
+- On browser, go to http://localhost:3000 to use the app
 
 ## Running Manually
 
