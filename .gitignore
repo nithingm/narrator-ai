@@ -13,13 +13,22 @@ out/
 .env.development
 .env.production
 
+#Build Artifacts
+build/
+dist/
+
 #Allow the template .env file to be committed
-!backend/.env
+!backend/.env.example
+!frontend/.env.example
+!.env.example
+
 
 # Ignore system files
 .DS_Store
 *.log
 *.lock
+backend/*.log
+frontend/*.log
 
 # Ignore package manager lock files (if not needed)
 pnpm-lock.yaml

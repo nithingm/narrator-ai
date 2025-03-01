@@ -3,11 +3,32 @@
 A gothic-themed chatbot where users can select a book, choose a character, and chat with them. The app supports multiple AI models including OpenAI, DeepSeek, Claude, and local models via Ollama.
 
 ## Setup
-1. Install ollama for local model llama3.2:1b
-```bash
-ollama run llama3.2:1b
+1. Ensure node.js is installed on your system for this to work 
+
+2. Open git bash in the intended install folder and enter:
+```git
+git clone https://github.com/nithingm/narrator-ai.git
 ```
-2. Replace .env file contents with API keys in the project folder to use OpenAI/Claude/Deepseek.
+
+3. Go to backend folder ( cd .\backend\ ) and enter:
+```bash
+npm install
+npm run dev
+```
+Should run on http://localhost:5000
+
+4. Open another terminal to go to frontend folder ( cd .\frontend\ ) and enter:
+```bash
+npm install
+npm run dev
+```
+Should run on http://localhost:3000
+
+5. Install ollama for local models. For example, you can install llama3.2:1b using:
+```bash
+ollama pull llama3.2:1b
+```
+6. Replace .env file contents with API keys in the project folder to use OpenAI/Claude/Deepseek.
    
 ## Quick Start
 
