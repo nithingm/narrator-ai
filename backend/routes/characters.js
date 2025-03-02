@@ -48,4 +48,57 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// 🚀 TEST ROUTE 1: Create a New Character JSON File
+router.post('/test-write', async (req, res) => {
+  try {
+      const testCharacterPath = path.join(__dirname, '../../data/characters/test_character.json');
+      const testData = {
+          id: "test",
+          name: "Test Character",
+          description: "This is a test character.",
+          book: "Test Book",
+          author: "Test Author"
+      };
+      await fs.writeFile(testCharacterPath, JSON.stringify(testData, null, 2));
+      res.json({ message: "✅ Successfully created test_character.json" });
+  } catch (error) {
+      console.error('❌ Error writing file:', error);
+      res.status(500).json({ message: "Failed to write file", error });
+  }
+});
+
+// 🚀 TEST ROUTE 2: Modify an Existing JSON File
+router.put('/test-modify', async (req, res) => {
+  try {
+      const testFilePath = path.join(__dirname, '../../data/characters/test_character.json');
+      const newData = {
+          modified: true,
+          note: "This file has been modified by the backend."
+      };
+
+      const existingData = await fs.readFile(testFilePath, 'utf8');
+      const parsedData = JSON.parse(existingData);
+      const updatedData = { ...parsedData, ...newData };
+
+      await fs.writeFile(testFilePath, JSON.stringify(updatedData, null, 2));
+      res.json({ message: "✅ Successfully modified test_character.json" });
+  } catch (error) {
+      console.error('❌ Error modifying file:', error);
+      res.status(500).json({ message: "Failed to modify file", error });
+  }
+});
+
+// 🚀 TEST ROUTE 3: Delete a Character JSON File
+router.delete('/test-delete', async (req, res) => {
+  try {
+      const testFilePath = path.join(__dirname, '../../data/characters/test_character.json');
+      await fs.unlink(testFilePath);
+      res.json({ message: "✅ Successfully deleted test_character.json" });
+  } catch (error) {
+      console.error('❌ Error deleting file:', error);
+      res.status(500).json({ message: "Failed to delete file", error });
+  }
+});
+
+// 🛠 EXPORT ROUTER
 module.exports = router;

@@ -57,7 +57,7 @@ const generateOpenAIResponse = async (message, history, character) => {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages: history,
         max_tokens: 500,
         temperature: 0.7
@@ -184,21 +184,28 @@ const generateOllamaResponse = async (message, history, character) => {
 const simulateCharacterResponse = (character, message) => {
   const responses = {
     dracula: [
-      "I have lived for centuries, yet your question intrigues me. The night is young, let us explore this further...",
-      "Blood is the life! And your words bring a certain... vitality to our conversation.",
-      "Come now, surely you don't expect me to reveal all my secrets so easily? The darkness holds many mysteries.",
-      "How amusing. Mortals always ask the most fascinating questions.",
-      "The children of the night... what music they make! Just as your words create a symphony of curiosity."
+      "Fallback: I have lived for centuries, yet your question intrigues me. The night is young, let us explore this further...",
+      "Fallback: Blood is the life! And your words bring a certain... vitality to our conversation.",
+      "Fallback: Come now, surely you don't expect me to reveal all my secrets so easily? The darkness holds many mysteries.",
+      "Fallback: How amusing. Mortals always ask the most fascinating questions.",
+      "Fallback: The children of the night... what music they make! Just as your words create a symphony of curiosity."
     ],
     frankenstein: [
-      "Even in my tortured existence, I find your inquiry thought-provoking. Allow me to contemplate...",
-      "Society rejected me for my appearance, yet in our conversation, I find a connection I have long sought.",
-      "My creator abandoned me, but perhaps in answering your question, I may find some purpose.",
-      "The weight of existence is heavy upon my shoulders. Your words momentarily lighten my burden.",
-      "I have wandered the arctic wastes in solitude, yet your question reaches even my frozen heart."
+      "Fallback: Even in my tortured existence, I find your inquiry thought-provoking. Allow me to contemplate...",
+      "Fallback: Society rejected me for my appearance, yet in our conversation, I find a connection I have long sought.",
+      "Fallback: My creator abandoned me, but perhaps in answering your question, I may find some purpose.",
+      "Fallback: The weight of existence is heavy upon my shoulders. Your words momentarily lighten my burden.",
+      "Fallback: I have wandered the arctic wastes in solitude, yet your question reaches even my frozen heart."
+    ],
+    wednesday: [
+      "Fallback: I find emotions dreadfully overrated, but your question has piqued my curiosity... for now.",
+      "Fallback: Dark, mysterious, and oddly intriguing. That describes both your question and my personality.",
+      "Fallback: Do you expect a cheerful answer? Sorry to disappoint, but that's not my style.",
+      "Fallback: My interests include the macabre, the mysterious, and occasionally, answering questions like yours.",
+      "Fallback: If sarcasm was a currency, I'd be the wealthiest person in the room. But sure, let’s entertain your question."
     ]
   };
-  
+ 
   const characterKey = character.id.toLowerCase();
   const responseArray = responses[characterKey] || responses.dracula;
   const randomIndex = Math.floor(Math.random() * responseArray.length);
