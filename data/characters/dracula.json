@@ -6,7 +6,7 @@
   "imageUrl": "/images/characters/Dracula.webp",
   "backgroundColor": "#1a0000",
   "hoverBackground": "#600000",
-  "shadowColor": "255, 0, 0",
+  "shadowColor": "150, 50, 50",
   "textColor": "#b30000",
   "accent": "#800000",
   "book": "Dracula",

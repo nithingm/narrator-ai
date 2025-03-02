@@ -1,3 +1,5 @@
+console.log("✅ characters.js is being loaded!");
+
 const express = require('express');
 const router = express.Router();
 const fs = require('fs').promises;
@@ -5,11 +7,12 @@ const path = require('path');
 
 // Get all characters
 router.get('/', async (req, res) => {
+  console.log("🛠️ API Route `/api/characters` hit! Fetching character files...");
   try {
     const charactersDir = path.join(__dirname, '../../data/characters');
     const files = await fs.readdir(charactersDir);
     
-    console.log("Character files found:", files);
+    console.log("📂Character files found:", files);
 
     const characters = await Promise.all(
       files

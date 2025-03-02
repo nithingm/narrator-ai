@@ -6,7 +6,7 @@
   "imageUrl": "/images/characters/Frankenstein.webp",
   "backgroundColor": "#0a1a10",
   "hoverBackground": "#003300",
-  "shadowColor": "0, 255, 0",
+  "shadowColor": "50, 150, 50",
   "textColor": "#4caf50",
   "accent": "#2e7d32",
   "book": "Frankenstein",

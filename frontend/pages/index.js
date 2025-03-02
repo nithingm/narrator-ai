@@ -43,7 +43,7 @@ const DEMO_CHARACTERS = [
     book: "The Addams Family",
     author: "Charles Addams",
     year: 1938,
-    defaultModel: "claude"
+    defaultModel: "openai"
   },
 
 ];
@@ -65,6 +65,7 @@ export default function Home() {
         // Check if we got a valid response with data
         if (response.data && response.data.length > 0) {
           setCharacters(response.data);
+          console.log("Updated Characters in FrontEnd:", response.data);
         } else {
           // Fall back to demo characters if API returns empty array
           console.log('No characters returned from API, using demo data');
@@ -77,6 +78,7 @@ export default function Home() {
         // Fall back to demo characters on error
         console.log('Error fetching characters, using demo data');
         setCharacters(DEMO_CHARACTERS);
+        console.log("📝 Using Demo Characters (Error Mode):", DEMO_CHARACTERS);
         setIsLoading(false);
       }
     };

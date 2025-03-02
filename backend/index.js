@@ -1,15 +1,18 @@
+console.log("🛠️ Backend is executing index.js...");
+const charactersRouter = require('./routes/characters');
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const bodyParser = require('body-parser');
-require('dotenv').config({path: '../.env'});
-
+require('dotenv').config({path: '../.env', override: true });
+console.log("🔍 OpenAI API Key from .env:", process.env.OPENAI_API_KEY?.substring(0, 10) + "...");
 const app = express();
 const PORT = 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
-
+console.log("🔍 Importing characters route...");
+app.use('/api/characters', charactersRouter);
 // API Keys (Make sure these are set in a .env file or manually in the terminal)
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
@@ -86,7 +89,7 @@ async function callOpenAI(systemPrompt, userMessage) {
         const response = await axios.post(
             "https://api.openai.com/v1/chat/completions",
             {
-                model: "gpt-4o",
+                model: "gpt-4o-mini",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: userMessage }
@@ -105,7 +108,7 @@ async function callOpenAI(systemPrompt, userMessage) {
         if (!response.data || !response.data.choices || response.data.choices.length === 0) {
             throw new Error("OpenAI response is missing choices.");
         }
-
+        console.log("✅ OpenAI Response:", response.data);
         return response.data.choices[0].message.content;
     } catch (error) {
         console.error("🚨 OpenAI API Error:", error.response?.data || error.message);
@@ -287,3 +290,9 @@ app.get('/api/characters', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
+
+
+app.use((req, res, next) => {
+    console.log(`📡 Request received: ${req.method} ${req.url}`);
+    next();
+  });
