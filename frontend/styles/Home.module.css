@@ -20,18 +20,18 @@
   color: var(--accent-color);
   font-size: 1.7rem;
   text-shadow: 
-    0 0 2px rgba(255, 0, 0, 0.8),  /* Outer Red Glow */
+    0 0 2px rgba(249, 224, 224, 0.8),  /* Outer Red Glow */
     0 0 4px rgba(255, 0, 0, 0.6),
-    0 0 6px rgba(255, 0, 0, 0.4),
+    0 0 6px rgba(247, 241, 241, 0.4),
     -1px -1px 2px rgba(0, 0, 0, 0.9); /* Heavy Shadow */
   letter-spacing: 2px;
   font-weight: 400;
-  animation: flicker 1.8s infinite alternate;
+  animation: flicker 11.9s infinite alternate;
 }
 @keyframes flicker {
   0% { opacity: 1; text-shadow: 0 0 3px rgba(255, 0, 0, 0.9); }
   50% { opacity: 0.8; text-shadow: 0 0 4px rgba(255, 0, 0, 0.7); }
-  100% { opacity: 1; text-shadow: 0 0 2px rgba(255, 0, 0, 0.8); }
+  100% { opacity: 1; text-shadow: 0 0 2px rgba(225, 50, 50, 0.8); }
 }
 
 .main {
@@ -64,6 +64,21 @@
   font-size: 0.9rem;
 }
 
+.loginButton {
+  background-color: var(--accent-color); /* Gothic red */
+  color: rgb(216, 213, 213);
+  border: 1px solid var(--border-color);
+  font-weight: 10;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  transition: background 0.2s ease, box-shadow 0.3s ease;
+}
+
+.loginButton:hover {
+  background-color: darkred;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+}
+
 /* Book selection */
 .bookSelectionContainer {
   text-align: center;
@@ -71,19 +86,27 @@
 
 /* Main Subtitle (Choose a Gothic Character) */
 .bookSelectionTitle {
-  font-family: 'UnifrakturMaguntia', serif;
+  font-family: 'UnifrakturMaguntia', cursive;
   font-size: 3.5rem;
   /*color: var(--accent-color);*/
-  color: #660000;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+  color: #f4f3dd;
+  /*text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
   letter-spacing: 1px;
-  font-weight: 400;
+  font-weight: 400;*/
+  text-shadow:
+        -1px -1px 0 #04a0de,
+        2.5px 4px 1px #9b0101,
+        0 0 0 #1a1a1a,  
+        0 0.5px 0 #e9f903;
+  letter-spacing: 4px;
+  
 }
 
 .bookSelectionSubtitle {
   font-size: 1.1rem;
   color: #aaa;
   margin-bottom: 40px;
+  letter-spacing: 1.5px;
 }
 
 .bookGrid {

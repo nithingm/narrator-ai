@@ -54,6 +54,8 @@ const ChatInterface = ({ character, onBack, user }) => {
       return "Good evening. I have been waiting for someone to disturb my slumber. What brings you to my castle at this late hour? Perhaps you seek knowledge that only the immortal can provide?";
     } else if (character.id === 'frankenstein') {
       return "Who approaches? Another mortal come to gaze upon the monster? Yet you do not flee... How curious. Have you questions for one such as I, rejected by mankind and my own creator?";
+    } else if (character.id === 'wednesday') {
+      return "You’re here. How unfortunate... for you. But I suppose if you have made it this far, you might as well stay. Just do not expect pleasantries. I find them exhausting.";
     } else {
       return `Welcome, I am ${character.name}. How may I assist you tonight?`;
     }

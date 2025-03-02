@@ -29,7 +29,8 @@ Should run on http://localhost:3000
 ```bash
 ollama pull llama3.2:1b
 ```
-6. Replace .env file contents with API keys in the project folder to use OpenAI/Claude/Deepseek.
+6. Replace .env.example file contents with API keys in the project folder to use OpenAI/Claude/Deepseek.
+   Please rename .env.example to .env
    
 ## Quick Start
 

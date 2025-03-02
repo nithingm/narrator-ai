@@ -31,7 +31,21 @@ const DEMO_CHARACTERS = [
     author: "Mary Shelley",
     year: 1818,
     defaultModel: "ollama"
-  }
+  },
+  {
+    id: "wednesday",
+    name: "Wednesday Addams",
+    title: "The Macabre Prodigy",
+    description: "A sharp-witted, morbidly curious girl with a fascination for the dark and the peculiar. She revels in gothic literature, classical music, and unconventional experiments. Unmoved by societal norms, her deadpan humor and love for the macabre set her apart. Beneath her icy demeanor lies fierce intelligence and a hidden sense of loyalty to those she deems worthy.",
+    backgroundColor: "#1a0a10",
+    textColor: "#d4a5a5",
+    accent: "#7d2e2e",
+    book: "The Addams Family",
+    author: "Charles Addams",
+    year: 1938,
+    defaultModel: "claude"
+  },
+
 ];
 
 export default function Home() {
@@ -47,7 +61,7 @@ export default function Home() {
       try {
         setIsLoading(true);
         const response = await axios.get('http://localhost:5000/api/characters');
-        
+        console.log("API Response:", response.data);
         // Check if we got a valid response with data
         if (response.data && response.data.length > 0) {
           setCharacters(response.data);
@@ -79,13 +93,20 @@ export default function Home() {
   };
   
   const handleLogin = async (username, password) => {
-    try {
+      try {//Comment out this try catch block and bring in the below block- Only for mock login
+        console.log("Mock login for", username);  // Debugging
+        setUser({ username: username }); // Mock user login
+    } catch (error) {
+        console.error("Mock login failed:", error);
+    }
+  };
+    /*try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         username,
         password
       });
       
-      // Store token and user info
+      // Store andtoken  user info
       localStorage.setItem('token', response.data.token);
       setUser(response.data.user);
       return true;
@@ -95,10 +116,11 @@ export default function Home() {
       setUser({ username: username || 'Demo User' });
       return true;
     }
-  };
+  };*/
   
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    console.log("Mock logout");
+    //localStorage.removeItem('token'); //Bring back in for real login
     setUser(null);
   };
   
@@ -123,8 +145,8 @@ export default function Home() {
         <div className={styles.userSection}>
           {user ? (
             <>
-              <span>Welcome, {user.username}</span>
-              <button onClick={handleLogout} className={styles.logoutButton}>Logout</button>
+              <span>Welcome, {user.username}!</span>
+              <button onClick={handleLogout} className={styles.logoutButton}>Vanish</button>
             </>
           ) : (
             <div className={styles.authButtons}>
@@ -132,11 +154,11 @@ export default function Home() {
                 onClick={() => {
                   // In a real app, show a login form
                   // For demo, we'll just log in as a demo user
-                  handleLogin('demo', 'password');
+                  handleLogin('mortal', 'password');
                 }}
                 className={styles.loginButton}
               >
-                Login
+                Manifest
               </button>
             </div>
           )}

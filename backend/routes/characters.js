@@ -9,15 +9,19 @@ router.get('/', async (req, res) => {
     const charactersDir = path.join(__dirname, '../../data/characters');
     const files = await fs.readdir(charactersDir);
     
+    console.log("Character files found:", files);
+
     const characters = await Promise.all(
       files
         .filter(file => file.endsWith('.json'))
         .map(async (file) => {
-          const content = await fs.readFile(path.join(charactersDir, file), 'utf8');
+          const filePath = path.join(charactersDir, file);
+          console.log("Reading file:", filePath);
+          const content = await fs.readFile(filePath, 'utf8');
           return JSON.parse(content);
         })
     );
-    
+    console.log("Final characters sent to frontend:", characters);
     res.json(characters);
   } catch (error) {
     console.error('Error fetching characters:', error);
