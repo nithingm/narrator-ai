@@ -81,7 +81,7 @@ npm run dev
 - User authentication system*
 - Persistent conversation memory per character*
 - Local-first approach to minimize cloud costs
- *feature in progress
+ *\*feature in progress*
  
 ## Demo Mode
 
