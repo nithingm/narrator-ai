@@ -179,21 +179,21 @@
 }
 
 
-.bookCover {
+/*.bookCover {
   height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-}
+}*/
 
 /* Gothic Style Initials (C, F) */
-.bookImagePlaceholder {
+/*.bookImagePlaceholder {
   font-size: 4rem;
   font-family: var(--gothic-font);
   color: white;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-}
+}*/
 
 .bookInfo {
   padding: 15px;
@@ -224,13 +224,13 @@
   margin-bottom: 15px;
 }
 
-.bookDescription {
+/*.bookDescription {
   font-family: var(--classic-font);
   font-size: 1rem;
   color: #bbb;
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
   line-height: 1.6;
-}
+}*/
 
 .bookMeta {
   font-size: 0.9rem;
@@ -268,12 +268,12 @@
   transform: translateY(0);
 }
 
-.bookMetadata {
+/*.bookMetadata {
   display: flex;
   flex-direction: column;
   font-size: 0.8rem;
   color: #777;
-}
+}*/
 
 /* Chat interface */
 .chatContainer {
