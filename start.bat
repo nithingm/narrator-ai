@@ -1,14 +1,14 @@
 @echo off
 echo Checking for existing processes on port 5000...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5000') do (
-    echo Killing process %%a on port 5000...
-    taskkill /PID %%a /F
+    echo Found process %%a on port 5000. Killing...
+    taskkill /PID %%a /F >nul 2>&1 && echo Process %%a terminated. || echo Process %%a was not running.
 )
 
 echo Checking for existing processes on port 3000...
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000') do (
-    echo Killing process %%a on port 3000...
-    taskkill /PID %%a /F
+    echo Found process %%a on port 3000. Killing...
+    taskkill /PID %%a /F >nul 2>&1 && echo Process %%a terminated. || echo Process %%a was not running.
 )
 
 echo Deleting .next folder...
@@ -22,15 +22,18 @@ if exist "frontend\.next" (
 echo Starting Narrator AI backend server...
 start "Backend" cmd /c "cd backend && npm run dev"
 
-timeout /t 2
+:: Ensure proper timeout in all environments
+ping -n 3 127.0.0.1 >nul
 
 echo Starting Narrator AI frontend...
 start "Frontend" cmd /c "cd frontend && npm run dev"
 
-echo Narrator AI is running!
+echo ====================================
+echo       Narrator AI is running!
 echo Backend: http://localhost:5000
 echo Frontend: http://localhost:3000
+echo ====================================
 echo Press any key to stop all servers...
 
 pause
-taskkill /IM node.exe /F
+taskkill /IM node.exe /F >nul 2>&1 && echo Backend and frontend stopped. || echo No running Node.js processes found.

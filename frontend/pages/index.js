@@ -2,101 +2,52 @@ import React, { useState, useEffect } from 'react';
 import styles from '../styles/Home.module.css';
 import BookSelection from '../components/BookSelection';
 import ChatInterface from '../components/ChatInterface';
-import DEMO_CHARACTERS from '../data/demoCharacters';
-import axios from 'axios';
+import { fetchCharacters } from '../utils/api';  // ✅ Import API call function
+import { handleLogin, handleLogout, checkAuthStatus } from '../utils/auth'; // ✅ Import Auth functions
 
 export default function Home() {
-  const [characters, setCharacters] = useState([]);
-  const [selectedCharacter, setSelectedCharacter] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-  
-  // Fetch characters on page load
+  const [characters, setCharacters] = useState([]); // Character list state
+  const [selectedCharacter, setSelectedCharacter] = useState(null); // Selected character state
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [user, setUser] = useState(null); // User authentication state
+
+  // ✅ Fetch characters from API on page load
   useEffect(() => {
-    const fetchCharacters = async () => {
-      try {
-        setIsLoading(true);
-        const response = await axios.get('http://localhost:5000/api/characters');
-        console.log("API Response:", response.data);
-        // Check if we got a valid response with data
-        if (response.data && response.data.length > 0) {
-          setCharacters(response.data);
-          console.log("Updated Characters in FrontEnd:", response.data);
-        } else {
-          // Fall back to demo characters if API returns empty array
-          console.log('No characters returned from API, using demo data');
-          setCharacters(DEMO_CHARACTERS);
-        }
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching characters:', error);
-        // Fall back to demo characters on error
-        console.log('Error fetching characters, using demo data');
-        setCharacters(DEMO_CHARACTERS);
-        console.log("📝 Using Demo Characters (Error Mode):", DEMO_CHARACTERS);
-        setIsLoading(false);
-      }
-    };
-    
-    fetchCharacters();
+    fetchCharacters(setCharacters, setIsLoading);
   }, []);
-  
+
+  // ✅ Check authentication status on page load
+  useEffect(() => {
+    setUser(checkAuthStatus());
+  }, []);
+
+  // ✅ Handle character selection
   const handleCharacterSelect = (character) => {
     setSelectedCharacter(character);
   };
-  
+
+  // ✅ Handle going back to book selection
   const handleBackToBooks = () => {
     setSelectedCharacter(null);
   };
-  
-  const handleLogin = async (username, password) => {
-      try {//Comment out this try catch block and bring in the below block- Only for mock login
-        console.log("Mock login for", username);  // Debugging
-        setUser({ username: username }); // Mock user login
-    } catch (error) {
-        console.error("Mock login failed:", error);
-    }
+
+  // ✅ Handle user login
+  const loginUser = async (username, password) => {
+    const loggedInUser = await handleLogin(username, password);
+    if (loggedInUser) setUser(loggedInUser);
   };
-    /*try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
-        username,
-        password
-      });
-      
-      // Store andtoken  user info
-      localStorage.setItem('token', response.data.token);
-      setUser(response.data.user);
-      return true;
-    } catch (error) {
-      console.error('Login error:', error);
-      // Demo mode - still log in even on error
-      setUser({ username: username || 'Demo User' });
-      return true;
-    }
-  };*/
-  
-  const handleLogout = () => {
-    console.log("Mock logout");
-    //localStorage.removeItem('token'); //Bring back in for real login
+
+  // ✅ Handle user logout
+  const logoutUser = () => {
+    handleLogout();
     setUser(null);
   };
-  
-  // Check for existing token on page load
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // In a real app, you'd verify the token with the server
-      // For demo, we'll just set the user as logged in
-      setUser({ username: 'User' });
-    }
-  }, []);
-  
+
+  // ✅ Show loading screen if data is still loading
   if (isLoading) {
     return <div className={styles.loadingContainer}>Loading the gothic library...</div>;
   }
-  
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -105,16 +56,12 @@ export default function Home() {
           {user ? (
             <>
               <span>Welcome, {user.username}!</span>
-              <button onClick={handleLogout} className={styles.logoutButton}>Vanish</button>
+              <button onClick={logoutUser} className={styles.logoutButton}>Vanish</button>
             </>
           ) : (
             <div className={styles.authButtons}>
-              <button 
-                onClick={() => {
-                  // In a real app, show a login form
-                  // For demo, we'll just log in as a demo user
-                  handleLogin('mortal', 'password');
-                }}
+              <button
+                onClick={() => loginUser('mortal', 'password')}
                 className={styles.loginButton}
               >
                 Manifest
@@ -123,7 +70,7 @@ export default function Home() {
           )}
         </div>
       </div>
-      
+
       <main className={styles.main}>
         {selectedCharacter ? (
           <ChatInterface
@@ -138,7 +85,7 @@ export default function Home() {
           />
         )}
       </main>
-      
+
       <footer className={styles.footer}>
         <p>Narrator AI - A Gothic Literary Chatbot Experience</p>
       </footer>

@@ -21,7 +21,7 @@
 html,
 body {
   font-family: var(--font-main);
-  background: var(--background-color) url('/images/background-texture.png') repeat;
+  background: var(--background-color);
   opacity: 0.95;
   color: var(--text-color);
   height: 100%;
