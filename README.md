@@ -50,7 +50,7 @@ start start.bat
 
 - This should start both, the backend server and the frontend development server.
 
-- On browser, go to http://localhost:3000 to use the app
+2. On browser, go to http://localhost:3000 to use the app
 
 ## Running Manually
 
@@ -81,7 +81,8 @@ npm run dev
 - User authentication system*
 - Persistent conversation memory per character*
 - Local-first approach to minimize cloud costs
- *\*feature in progress*
+
+*\*feature in progress*
  
 ## Demo Mode
 
