@@ -46,8 +46,11 @@ const ChatInterface = ({ character, onBack, user }) => {
   
   // Auto-scroll to latest message
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages.length]); // ✅ Only trigger when messages array changes
+  
   
   const getWelcomeMessage = (character) => {
     if (character.id === 'Dracula') {
@@ -91,16 +94,6 @@ const ChatInterface = ({ character, onBack, user }) => {
             throw new Error("Invalid response from AI API.");
         }
 
-        const aiMessage = {
-            role: 'assistant',
-            content: response.data?.message || "Hmm... It seems something went wrong. Try again?",
-            timestamp: new Date().toISOString(),
-            isError: !response.data?.message
-        };
-        setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-        console.error("Error sending message:", error);
-
         // ✅ Handle DeepSeek API-specific errors
         let errorMessage = "I apologize, but something went wrong.";
         if (error.response) {
@@ -122,9 +115,6 @@ const ChatInterface = ({ character, onBack, user }) => {
   };
 
 
-  
-  
-  
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
       e.preventDefault();
@@ -139,16 +129,15 @@ const ChatInterface = ({ character, onBack, user }) => {
         onChange={(e) => setModelProvider(e.target.value)}
         className={styles.modelSelector}
       >
-        <option value="openai">OpenAI</option>
-        <option value="claude">Claude</option>
-        <option value="deepseek">DeepSeek</option>
-
         {/* Dynamically List Ollama Models */}
         {ollamaModels.map((model) => (
           <option key={model} value={model}>
             Local: {model}
           </option>
         ))}
+        <option value="openai">OpenAI</option>
+        <option value="claude">Claude</option>
+        <option value="deepseek">DeepSeek</option>
       </select>
     );
   };
