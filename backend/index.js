@@ -11,6 +11,12 @@ const PORT = 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Health check endpoint for frontend connectivity
+app.get('/api/health', (req, res) => {
+    res.json({ status: "ok" });
+});
+
 console.log("🔍 Importing characters route...");
 app.use('/api/characters', charactersRouter);
 // API Keys (Make sure these are set in a .env file or manually in the terminal)
@@ -43,7 +49,7 @@ app.post('/api/chat', async (req, res) => {
     try {
         console.log("🟢 Received chat request:", req.body);  // ✅ Debug log
 
-        // ✅ Change `const` to `let` so it can be reassigned
+        // Change `const` to `let` so it can be reassigned
         let { message, characterId, modelProvider, systemPrompt } = req.body;
         
         if (!message || !modelProvider) {
@@ -53,7 +59,7 @@ app.post('/api/chat', async (req, res) => {
 
         console.log(`💬 Incoming request → Model: ${modelProvider}, Character: ${characterId}`);
         
-        // 🔥 Fix: Auto-prefix "ollama:" if it's a local model
+        // Fix: Auto-prefix "ollama:" if it's a local model
         if (!["openai", "deepseek", "claude"].includes(modelProvider)) {
             modelProvider = `ollama:${modelProvider}`;
         }
@@ -104,7 +110,7 @@ async function callOpenAI(systemPrompt, userMessage) {
             }
         );
 
-        // ✅ Safely check if choices exist
+        // Safely check if choices exist
         if (!response.data || !response.data.choices || response.data.choices.length === 0) {
             throw new Error("OpenAI response is missing choices.");
         }
@@ -118,7 +124,7 @@ async function callOpenAI(systemPrompt, userMessage) {
 }
 
 
-// ✅ Function to call DeepSeek API (Similar to OpenAI)
+// Function to call DeepSeek API
 async function callDeepSeek(systemPrompt, userMessage) {
   try {
       const response = await axios.post(
@@ -155,7 +161,7 @@ async function callDeepSeek(systemPrompt, userMessage) {
 }
 
 
-// ✅ Function to call Claude API (Anthropic)
+// Function to call Claude API (Anthropic)
 async function callClaude(systemPrompt, userMessage) {
   try {
       const response = await axios.post(
@@ -175,7 +181,7 @@ async function callClaude(systemPrompt, userMessage) {
           }
       );
 
-      // ✅ Ensure response has valid content before accessing
+      // Ensure response has valid content before accessing
       if (!response.data || !response.data.content) {
         throw new Error("Invalid response from Claude API.");
         }
@@ -215,7 +221,7 @@ async function callClaude(systemPrompt, userMessage) {
 }
 
 
-// ✅ Function to call Ollama (local LLM)
+// Function to call Ollama (local LLM)
 async function callOllama(modelName, systemPrompt, userMessage) {
     try {
         if (modelName.startsWith("ollama:")) {
@@ -233,7 +239,7 @@ async function callOllama(modelName, systemPrompt, userMessage) {
         );
         
         console.log("🟢 Ollama response:", response.data);
-        // ✅ Validate the response format before returning
+        // Validate the response format before returning
         if (!response.data || !response.data.response) {
             throw new Error("Invalid response from Ollama API.");
         }
@@ -242,12 +248,12 @@ async function callOllama(modelName, systemPrompt, userMessage) {
     } catch (error) {
         console.error("🚨 Ollama API Error:", error.response?.data || error.message);
 
-        // ✅ Ensure a safe error message is returned instead of crashing UI
+        // Ensure a safe error message is returned instead of crashing UI
         return "Error: Failed to generate a response from Ollama. Please check the model or try again.";
     }
 }
 
-// ✅ Route to return available characters
+// Route to return available characters
 app.get('/api/characters', (req, res) => {
   const characters = [
       {

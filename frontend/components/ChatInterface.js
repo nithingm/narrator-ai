@@ -1,147 +1,145 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import styles from '../styles/Home.module.css';
+import { handleApiError } from '../utils/errorHandler'; // Centralized error handling
 
 const ChatInterface = ({ character, onBack, user }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null); // Store backend error status
   const [modelProvider, setModelProvider] = useState(character.defaultModel || 'ollama');
-  const [ollamaModels, setOllamaModels] = useState([]); //Store available ollama models
+  const [ollamaModels, setOllamaModels] = useState([]);
   const messagesEndRef = useRef(null);
-  
-  // Fetch available Ollama models on component mount
+  const hasAddedWelcome = useRef(false);
+
+  // ✅ Check backend status periodically every 5 seconds
+  useEffect(() => {
+    const checkBackendStatus = async () => {
+      try {
+        await axios.get('http://localhost:5000/api/health'); // Ensure this endpoint exists in backend
+        setErrorMessage(null); // ✅ Clear error if backend is online
+      } catch (error) {
+        setErrorMessage('Backend is offline. Ensure the server is running.');
+      }
+    };
+
+    checkBackendStatus(); // Initial check
+    const interval = setInterval(checkBackendStatus, 5000); // Poll every 5s
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, []);
+
+  // ✅ Fetch available Ollama models on component mount
   useEffect(() => {
     const fetchOllamaModels = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/ollama-models');
         setOllamaModels(response.data.models || []);
       } catch (error) {
-        console.error("Error fetching Ollama models:", error);
+        console.error('Error fetching Ollama models:', error);
       }
     };
 
     fetchOllamaModels();
   }, []);
 
-  // Add initial welcome message on component mount
+  // ✅ Add initial welcome message only once per session
   useEffect(() => {
-    if (!character || !character.id) return;
-  
-    const welcomeMessage = {
-      role: 'assistant',
-      content: getWelcomeMessage(character),
-      timestamp: new Date().toISOString()
-    };
-  
-    setMessages(prevMessages => {
-      // Only add welcome message if it's a new character
-      if (prevMessages.length === 0 || prevMessages[0].role !== 'assistant') {
-        return [welcomeMessage];
-      }
-      return prevMessages;
-    });
-  }, [character]);
-  
-  
-  // Auto-scroll to latest message
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages.length]); // ✅ Only trigger when messages array changes
-  
-  
-  const getWelcomeMessage = (character) => {
-    if (character.id === 'Dracula') {
-      return "Good evening. I have been waiting for someone to disturb my slumber. What brings you to my castle at this late hour? Perhaps you seek knowledge that only the immortal can provide?";
-    } else if (character.id === 'Frankenstein') {
-      return "Who approaches? Another mortal come to gaze upon the monster? Yet you do not flee... How curious. Have you questions for one such as I, rejected by mankind and my own creator?";
-    } else if (character.id === 'Wednesday') {
-      return "You’re here. How unfortunate... for you. But I suppose if you have made it this far, you might as well stay. Just do not expect pleasantries. I find them exhausting.";
-    } else {
-      return `Welcome, I am ${character.name}. What is it that you seek?`;
-    }
-  };
-  
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return; // Prevent duplicate sends
+    if (!character?.id || hasAddedWelcome.current) return;
 
-    const currentMessage = input; // Preserve message before clearing input
+    hasAddedWelcome.current = true;
+    setMessages([
+      { 
+        role: 'assistant', 
+        content: getWelcomeMessage(character), 
+        timestamp: new Date().toISOString() 
+      }
+    ]);
+  }, [character]);
+
+  // ✅ Auto-scroll to latest message
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length]);
+
+  // ✅ Define personalized welcome messages
+  const getWelcomeMessage = (character) => {
+    const messages = {
+      Dracula: "Good evening. I have been waiting for someone to disturb my slumber. What brings you to my castle at this late hour?",
+      Frankenstein: "Who approaches? Another mortal come to gaze upon the monster? Yet you do not flee... How curious.",
+      Wednesday: "You’re here. How unfortunate... for you. But I suppose if you have made it this far, you might as well stay.",
+    };
+    return messages[character.id] || `Welcome, I am ${character.name}. What is it that you seek?`;
+  };
+
+  // ✅ Handle sending a message to AI
+  const handleSendMessage = async () => {
+    if (!input.trim() || isLoading || errorMessage) return; // Prevent sending if backend is down
+
+    const currentMessage = input;
     setMessages(prev => [...prev, { role: 'user', content: currentMessage, timestamp: new Date().toISOString() }]);
     setInput('');
     setIsLoading(true);
+    setErrorMessage(null); // Clear error before new request
 
     let selectedModel = modelProvider;
-    
-    // 🔥 Fix: Ensure local models are prefixed with "ollama:"
     if (!["openai", "deepseek", "claude"].includes(selectedModel)) {
-        selectedModel = `ollama:${selectedModel}`;
+      selectedModel = `ollama:${selectedModel}`;
     }
-    
-    console.log("🟢 Sending message with model:", selectedModel);  // ✅ Debug log
+
+    console.log("🟢 Sending message with model:", selectedModel);
 
     try {
-        const response = await axios.post('http://localhost:5000/api/chat', {
-            message: currentMessage,
-            characterId: character.id,
-            modelProvider: selectedModel,  // ✅ Use corrected model name
-            systemPrompt: character.systemPrompt
-        });
+      const response = await axios.post('http://localhost:5000/api/chat', {
+        message: currentMessage,
+        characterId: character.id,
+        modelProvider: selectedModel,
+        systemPrompt: character.systemPrompt
+      });
 
-        // ✅ Ensure response and response.data exist before accessing them
-        if (!response || !response.data || !response.data.message) {
-            throw new Error("Invalid response from AI API.");
-        }
+      if (!response?.data?.message) {
+        throw new Error("Invalid response from AI API.");
+      }
 
-        // ✅ Handle DeepSeek API-specific errors
-        let errorMessage = "I apologize, but something went wrong.";
-        if (error.response) {
-            if (error.response.status === 500) {
-                errorMessage = "DeepSeek API is unavailable or requires payment. Try a different model.";
-            } else if (error.response.status === 403) {
-                errorMessage = "Access denied to DeepSeek. Check API settings.";
-            } else {
-                errorMessage = `Server Error: ${error.response.status} - ${error.response.data?.error || "Unknown error"}`;
-            }
-        } else if (error.request) {
-            errorMessage = "No response from the AI model. Please check your connection.";
-        }
-
-        setMessages(prev => [...prev, { role: 'assistant', content: errorMessage, timestamp: new Date().toISOString(), isError: true }]);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: response.data.message,
+        timestamp: new Date().toISOString()
+      }]);
+    } catch (error) {
+      const errorMsg = handleApiError(error, selectedModel);
+      setErrorMessage(errorMsg); // Show backend error
+      setMessages(prev => [...prev, { role: 'assistant', content: errorMsg, timestamp: new Date().toISOString(), isError: true }]);
     } finally {
-        setIsLoading(false); // ✅ Ensure UI doesn't get stuck in loading state
+      setIsLoading(false);
     }
   };
 
-
-  const handleKeyPress = (e) => {
+  // ✅ Handle Enter key to send messages
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
       e.preventDefault();
       handleSendMessage();
     }
   };
-  // Generate AL Model Dropdown Options
-  const getAIModelOptions = () => {
-    return (
-      <select 
-        value={modelProvider}
-        onChange={(e) => setModelProvider(e.target.value)}
-        className={styles.modelSelector}
-      >
-        {/* Dynamically List Ollama Models */}
-        {ollamaModels.map((model) => (
-          <option key={model} value={model}>
-            Local: {model}
-          </option>
-        ))}
-        <option value="openai">OpenAI</option>
-        <option value="claude">Claude</option>
-        <option value="deepseek">DeepSeek</option>
-      </select>
-    );
-  };
-  
+
+  // ✅ AI Model Dropdown Selection
+  const aiModelOptions = useMemo(() => (
+    <select 
+      value={modelProvider}
+      onChange={(e) => setModelProvider(e.target.value)}
+      className={styles.modelSelector}
+    >
+      <option value="openai">OpenAI</option>
+      <option value="claude">Claude</option>
+      <option value="deepseek">DeepSeek</option>
+      {ollamaModels.map((model) => (
+        <option key={model} value={model}>Local: {model}</option>
+      ))}
+    </select>
+  ), [modelProvider, ollamaModels]);
+
   return (
     <div 
       className={styles.chatContainer}
@@ -161,51 +159,34 @@ const ChatInterface = ({ character, onBack, user }) => {
           {character.name}
         </h2>
         <div className={styles.chatOptions}>
-          {getAIModelOptions()}
+          {aiModelOptions}
         </div>
       </div>
-      
+
+      {/* ✅ Display Backend Error if Exists */}
+      {errorMessage && (
+        <div className={styles.errorBanner}>
+          {errorMessage}
+        </div>
+      )}
+
       <div className={styles.messagesContainer}>
         {messages.map((msg, index) => (
-          <div 
-            key={index}
-            className={`${styles.message} ${
-              msg.role === 'user' ? styles.userMessage : styles.aiMessage
-            } ${msg.isError ? styles.errorMessage : ''}`}
-            style={
-              msg.role === 'assistant' 
-                ? { borderColor: character.accent || '#444' }
-                : {}
-            }
-          >
+          <div key={index} className={`${styles.message} ${msg.role === 'user' ? styles.userMessage : styles.aiMessage}`}>
             <div className={styles.messageContent}>{msg.content}</div>
             <div className={styles.messageTime}>
               {new Date(msg.timestamp).toLocaleTimeString()}
             </div>
           </div>
         ))}
-        
-        {isLoading && (
-          <div 
-            className={`${styles.message} ${styles.aiMessage} ${styles.loadingMessage}`}
-            style={{ borderColor: character.accent || '#444' }}
-          >
-            <div className={styles.typingIndicator}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-        )}
-        
         <div ref={messagesEndRef} />
       </div>
-      
+
       <div className={styles.inputContainer}>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder="Type your message..."
           className={styles.chatInput}
           disabled={isLoading}
@@ -214,10 +195,6 @@ const ChatInterface = ({ character, onBack, user }) => {
           onClick={handleSendMessage}
           disabled={isLoading || !input.trim()}
           className={styles.sendButton}
-          style={{ 
-            backgroundColor: character.accent || '#444',
-            color: character.backgroundColor || '#1a1a1a'
-          }}
         >
           Send
         </button>
