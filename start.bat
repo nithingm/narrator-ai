@@ -36,7 +36,7 @@ if "%1"=="--skip-next" (
 )
 
 echo Starting Narrator AI backend server...
-start "Backend" cmd /c "cd backend && npm run dev"
+start "Backend" cmd /c "cd backend && npx ts-node index.ts"
 
 ping -n 3 127.0.0.1 >nul
 

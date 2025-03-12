@@ -1,13 +1,14 @@
-// frontend/utils/api.js
-import axios from "axios";
-import DEMO_CHARACTERS from "../data/demoCharacters";
+import axios from 'axios';
+import DEMO_CHARACTERS from '../data/demoCharacters';
 
-export const fetchCharacters = async (setCharacters, setIsLoading) => {
+export const fetchCharacters = async (
+  setCharacters: (characters: any[]) => void,
+  setIsLoading: (isLoading: boolean) => void
+) => {
   try {
     setIsLoading(true);
     const response = await axios.get("http://localhost:5000/api/characters");
     console.log("API Response:", response.data);
-
     if (response.data && response.data.length > 0) {
       setCharacters(response.data);
     } else {

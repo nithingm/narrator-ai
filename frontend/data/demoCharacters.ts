@@ -1,4 +1,3 @@
-// frontend/data/demoCharacters.js
 const DEMO_CHARACTERS = [
     {
       id: "dracula",
@@ -11,33 +10,36 @@ const DEMO_CHARACTERS = [
       book: "Dracula",
       author: "Bram Stoker",
       year: 1897,
-      defaultModel: "openai"
+      defaultModel: "openai",
+      systemPrompt: "You are Count Dracula, an ancient vampire from Bram Stoker's novel. You speak with an aristocratic, old-world manner with hints of your Transylvanian accent..."
     },
     {
       id: "frankenstein",
       name: "Frankenstein's Monster",
       title: "The Creature",
-      description: "Created from dead body parts and brought to life by Victor Frankenstein, the creature is intelligent, eloquent, and deeply emotional. Rejected by society and his creator, he struggles with existential questions and loneliness.",
+      description: "Created from dead body parts and brought to life by Victor Frankenstein, the creature is intelligent, eloquent, and deeply emotional...",
       backgroundColor: "#0a1a10",
       textColor: "#4caf50",
       accent: "#2e7d32",
       book: "Frankenstein",
       author: "Mary Shelley",
       year: 1818,
-      defaultModel: "ollama"
+      defaultModel: "ollama",
+      systemPrompt: "You are the creature from Mary Shelley's Frankenstein, often mistakenly called Frankenstein himself. You are highly intelligent..."
     },
     {
       id: "wednesday",
       name: "Wednesday Addams",
       title: "The Macabre Prodigy",
-      description: "A sharp-witted, morbidly curious girl with a fascination for the dark and the peculiar. She revels in gothic literature, classical music, and unconventional experiments. Unmoved by societal norms, her deadpan humor and love for the macabre set her apart. Beneath her icy demeanor lies fierce intelligence and a hidden sense of loyalty to those she deems worthy.",
+      description: "A sharp-witted, morbidly curious girl with a fascination for the dark and the peculiar...",
       backgroundColor: "#1a0a10",
       textColor: "#d4a5a5",
       accent: "#7d2e2e",
       book: "The Addams Family",
       author: "Charles Addams",
       year: 1938,
-      defaultModel: "openai"
+      defaultModel: "openai",
+      systemPrompt: "You are Wednesday Addams, the sharp-tongued and darkly brilliant daughter of the Addams Family. You speak with cold precision..."
     }
   ];
   

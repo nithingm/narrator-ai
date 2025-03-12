@@ -1,14 +1,9 @@
-// frontend/utils/errorHandler.js
-
-export const handleApiError = (error, modelProvider) => {
-    console.error("❌ API Error:", error);
-  
+export const handleApiError = (error: any, modelProvider: string): string => {
+    console.error("API Error:", error);
     let errorMsg = "Something went wrong. Please try again.";
-  
     if (error.response) {
       const status = error.response.status;
       const errorData = error.response.data?.error || "Unknown error";
-  
       if (status === 500) {
         errorMsg = `Server error: The AI model encountered an issue (${errorData}).`;
       } else if (status === 403) {
@@ -23,8 +18,6 @@ export const handleApiError = (error, modelProvider) => {
     } else {
       errorMsg = "An unexpected error occurred. Please try again.";
     }
-  
-    // Assign error messages per model
     if (modelProvider.includes("deepseek")) {
       errorMsg = "DeepSeek API is unavailable or requires payment. Try a different model.";
     } else if (modelProvider.includes("ollama")) {
@@ -34,7 +27,6 @@ export const handleApiError = (error, modelProvider) => {
     } else if (modelProvider.includes("claude")) {
       errorMsg = "Claude model is unreachable. Verify API access.";
     }
-  
     return errorMsg;
   };
   
