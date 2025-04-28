@@ -2,8 +2,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "mongodb": "^6.14.2",
-    "mongoose": "^8.12.1",
-    "openssl": "^2.0.0"
+    "mongoose": "^8.12.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
