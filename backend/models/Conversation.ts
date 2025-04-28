@@ -5,6 +5,8 @@ export interface IMessage {
   content: string;
   timestamp: Date;
   isError?: boolean;
+  deceptionScore?: number;  // NEW
+  modelUsed?: string;       // NEW
 }
 
 export interface IConversation extends Document {
@@ -18,6 +20,8 @@ const MessageSchema: Schema = new Schema({
   content: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
   isError: { type: Boolean, default: false },
+  deceptionScore: { type: Number },
+  modelUsed: { type: String },
 });
 
 const ConversationSchema: Schema = new Schema({
